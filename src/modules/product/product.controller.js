@@ -32,8 +32,9 @@ export const updateProduct = asyncWrapper(async(req,res)=>{
     if(!productFound){
         return res.status(404).json({message:'Product not found'})
     }
-    if(productFound.userId != owner){ 
-        return res.status(404).json({message:'You are not authorized'})
+    const notValidOwner = checkOwner(productFound,owner)
+    if(notValidOwner){
+        return res.status(400).json({message:'You are not authorized'})
     }
     const updatedProduct = await updateProducts(productId,{name,price,description})
     res.status(200).json({message:'Product updated successfully',updatedProduct})
@@ -46,8 +47,8 @@ export const deleteProduct = asyncWrapper(async(req,res)=>{
     if(!productFound){
         return res.status(404).json({message:'Product not found'})
     }
-    const ownerValid = checkOwner(productFound,owner)
-    if(ownerValid){
+    const notOwnerValid = checkOwner(productFound,owner)
+    if(notOwnerValid){
         return res.status(400).json({message:'You are not authorized'})
     }
     await deleteOneProduct(productId)
