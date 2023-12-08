@@ -68,8 +68,8 @@ export const listUsers = asyncWrapper(async(req,res)=>{
     res.status(200).json({message:'List of all users',users})
 })
 
-// export const userProduct = asyncWrapper(async(req,res)=>{
-//     const userId = req.query.owner
-//     const userProduct = await userProducts(userId)
-//     res.status(200).json({message:'Theses are products to owner' , userProduct})
-// })
+export const userProduct = asyncWrapper(async(req,res)=>{
+    const userId = req.query.owner
+    const userProduct = await userProducts(userId)
+    res.status(200).json({message:'Theses are products to owner' , userProduct})
+})
