@@ -14,7 +14,7 @@ export async function findEmail(email){
 }
 
 export async function create(userData){
-    const newUser = await User.create(userData)
+    await User.create(userData)
 }
 
 export async function findUByID(userId){
