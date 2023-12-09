@@ -9,5 +9,6 @@ router.put('/products',productController.updateProduct)
 router.delete('/products',productController.deleteProduct)
 router.get('/productsWithOwnerInfo',productController.getAllProductsWithOwners)
 router.get('/productsSorted',productController.sortProducts)
+router.get('/productLookup',productController.productWithOwnersUsingLookup)
 
 export default router

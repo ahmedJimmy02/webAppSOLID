@@ -46,3 +46,15 @@ export async function sortByCreatedAt(){
     const products = await Product.find().sort({createdAt:-1})
     return products
 }
+
+export async function usingLookup(){
+    const products = await Product.aggregate([
+        {$lookup:{
+            from:'users',
+            localField:'userId',
+            foreignField:'_id',
+            as:"userData"
+        }}
+    ])
+    return products
+}

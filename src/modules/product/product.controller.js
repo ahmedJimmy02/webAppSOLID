@@ -1,7 +1,7 @@
 import asyncWrapper from '../../../utils/asyncWrapper.js'
 import Product from '../../../db/models/product.model.js'
 import User from '../../../db/models/user.model.js'
-import { checkOwner, createProduct, deleteOneProduct, findPById, findProducts, productsWithOwners, sortByCreatedAt, updateProducts, validateRequestNote } from '../../../services/product.services.js'
+import { checkOwner, createProduct, deleteOneProduct, findPById, findProducts, productsWithOwners, sortByCreatedAt, updateProducts, usingLookup, validateRequestNote } from '../../../services/product.services.js'
 import { findUByID } from '../../../services/user.services.js'
 
 
@@ -63,4 +63,9 @@ export const getAllProductsWithOwners = asyncWrapper(async(req,res)=>{
 export const sortProducts = asyncWrapper(async(req,res)=>{
     const sortedProducts = await sortByCreatedAt()
     res.status(200).json({message:'Products sorted descending by createdAt field',sortedProducts})
+})
+
+export const productWithOwnersUsingLookup = asyncWrapper(async(req,res)=>{
+    const products = await usingLookup()
+    res.status(200).json({message:'Products and their owners using lookup',products})
 })
