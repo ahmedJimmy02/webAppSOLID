@@ -2,6 +2,7 @@ import asyncWrapper from '../../../utils/asyncWrapper.js'
 import User from '../../../db/models/user.model.js'
 import Product from '../../../db/models/product.model.js'
 import { findEmail, create, validateRequest, findUByID, update, deleteU, searchSpecificWordsAndAge, searchAge, allUsers, userProducts } from '../../../services/user.services.js'
+import { correctPassword } from '../../../db/functions_db/user.functions.js'
 
 export const signUp = asyncWrapper(async(req,res)=>{
     const {username,email,password,age,gender,phone} = req.body
@@ -19,12 +20,13 @@ export const signUp = asyncWrapper(async(req,res)=>{
 
 export const signIn = asyncWrapper(async(req,res)=>{
     const {email,password} = req.body
-    const checkEmail = await findEmail(email)
-    if(!checkEmail){
+    const user = await findEmail(email)
+    if(!user){
         return res.status(404).json({message:'Email or password are wrong'})
     }
-    if(checkEmail.password != password){
-        return res.status(404).json({message:'Email or password are wrong'})
+    const checkPassword = correctPassword(user,password)
+    if(checkPassword){
+        return res.status(401).json({message:'Email or password are wrong'})
     }
     res.status(200).json({message:'You are logged successfully'})
 })

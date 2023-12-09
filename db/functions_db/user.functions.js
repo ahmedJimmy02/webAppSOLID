@@ -1,11 +1,18 @@
-import User from "../db/models/user.model.js"
-import Product from "../db/models/product.model.js"
+import User from "../models/user.model.js"
+import Product from "../models/product.model.js"
 
 export function validateRequest (req){
     const {username,email,password,age,gender,phone} = req.body
     if(!username||!email||!password||!age||!gender||!phone){
         return 'All fields are required'
     }
+}
+
+export function correctPassword(user,password){
+    if(user.password != password){
+        return 'You are not authorized'
+    }
+    return 
 }
 
 export async function findEmail(email){

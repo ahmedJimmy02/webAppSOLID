@@ -1,8 +1,6 @@
 import asyncWrapper from '../../../utils/asyncWrapper.js'
-import Product from '../../../db/models/product.model.js'
-import User from '../../../db/models/user.model.js'
-import { checkOwner, createProduct, deleteOneProduct, findPById, findProducts, productsWithOwners, sortByCreatedAt, updateProducts, usingLookup, validateRequestNote } from '../../../services/product.services.js'
-import { findUByID } from '../../../services/user.services.js'
+import { checkOwner, createProduct, deleteOneProduct, findPById, findProducts, productsWithOwners, sortByCreatedAt, updateProducts, usingLookup, validateRequestNote } from '../../../db/functions_db/product.functions.js'
+import { findUByID } from '../../../db/functions_db/user.functions.js'
 
 
 export const addProduct = asyncWrapper(async(req,res)=>{

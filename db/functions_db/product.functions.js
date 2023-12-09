@@ -1,4 +1,4 @@
-import Product from "../db/models/product.model.js"
+import Product from "../models/product.model.js"
 
 export function validateRequestNote(req){
     const {name,description,price,userId} = req.body
@@ -31,6 +31,7 @@ export function checkOwner(product,owner){
     if(product.userId != owner){
         return 'You are not authorized'
     }
+    return
 }
 
 export async function deleteOneProduct(productId){
