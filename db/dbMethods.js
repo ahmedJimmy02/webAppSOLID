@@ -28,8 +28,8 @@ export async function findAllMethod(modelType){
     return data
 }
 
-export function checkPasswordMethod(user, password){
-    if(user.password != password){
+export function checkPasswordMethod(Product, password){
+    if(product.password !== password){
         return 'You are not authorized'
     }
     return
@@ -89,4 +89,31 @@ export async function getProductsWithOwnerInfoUsingLookUp(modelType,fromModel,lo
 export async function getSortedDescendingByCreatedAt(modelType){
     const data = await modelType.find().sort({createdAt:-1})
     return data
+}
+
+export async function getNumberOfDocument(modelType){
+    const result = await modelType.aggregate([
+        {
+            // $group:{
+                // this is classification in name,price and description this result will be all documents in db if no duplicates documents
+            //     _id: {name:"$name" , price:"$price" , description:"$description"},
+            // },
+            // $group:{
+            //     _id:null,
+            //     count: { $sum: 1}
+            // }
+            // $group:{
+                // ignore duplicates exactly but he was make classification on the field you want
+            //     _id: '$description'
+            // }
+            // ***pipeline concept***
+            // filter all products with description = this is amazing product
+            $match:{description:"this is amazing product"}
+        },
+        // group products and retrieve name and calculate total price of this name 
+        {
+            $group:{_id:"$name" , totalPrice: {$sum:"$price"}}
+        }
+    ])
+    return result
 }

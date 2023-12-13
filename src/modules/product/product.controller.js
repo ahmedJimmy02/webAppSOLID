@@ -72,3 +72,8 @@ export const productWithOwnersUsingLookup = asyncWrapper(async(req,res)=>{
     const products = await dbMethods.getProductsWithOwnerInfoUsingLookUp(Product,'users','userId','_id','userData')
     res.status(200).json({message:'Products and their owners using lookup',products})
 })
+
+export const retrieveNumberOfDocuments = asyncWrapper(async(req,res)=>{
+    const result = await dbMethods.getNumberOfDocument(Product)
+    res.status(200).json({message:'This is the number of documents in model' , result})
+})

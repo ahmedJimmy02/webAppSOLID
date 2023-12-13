@@ -10,5 +10,6 @@ router.delete('/products',productController.deleteProduct)
 router.get('/productsWithOwnerInfo',productController.getAllProductsWithOwners)
 router.get('/productsSorted',productController.sortProducts)
 router.get('/productLookup',productController.productWithOwnersUsingLookup)
+router.get('/numberOfDocuments',productController.retrieveNumberOfDocuments)
 
 export default router
