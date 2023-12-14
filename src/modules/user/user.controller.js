@@ -5,7 +5,7 @@ import Product from '../../../db/models/product.model.js'
 
 export const signUp = asyncWrapper(async(req,res)=>{
     const {username,email,password,age,gender,phone} = req.body
-    const isEmailDuplicate = await dbMethods.findOneMethod(User,'email' , email)
+    const isEmailDuplicate = await dbMethods.findOneMethod(User,{email:email})
     if(isEmailDuplicate){
         return res.status(400).json({message:'This email already used'})
     }

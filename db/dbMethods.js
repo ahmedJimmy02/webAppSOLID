@@ -1,5 +1,5 @@
-export async function findOneMethod(modelType,field,value){
-    const data = await modelType.findOne({[field]: value})
+export async function findOneMethod(modelType,field){
+    const data = await modelType.findOne(field)
     return data
 }
 
@@ -30,9 +30,9 @@ export async function findAllMethod(modelType){
 
 export function checkPasswordMethod(Product, password){
     if(product.password !== password){
-        return 'You are not authorized'
+        return {message:'you are not authorized' , success:false}
     }
-    return
+        return {message:'Done' , success:true}
 }
 
 export async function searchWithNameAndAgeMethod(modelType,wordQuery , ageQuery){
@@ -64,9 +64,9 @@ export async function searchUserProducts(modelType,userId){
 
 export function checkIsThisOwnerOrNot(product , owner){
     if(product.userId != owner){
-        return 'You are not authorized'
+        return {message:'You are not authorized' , success:false}
     }
-    return
+    return {message:'You are not authorized' , success:true}
 }
 
 export async function getProductsWithOwnerInfo(modelType,refId){
