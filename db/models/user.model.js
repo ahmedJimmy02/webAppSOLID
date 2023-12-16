@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema(
     {timestamps:true}
 )
 
+userSchema.virtual('virtualUserName').get(function(){
+    return `This is my username :  ${this.username}`
+})
+
+
 const User = mongoose.model('User', userSchema) 
 
 export default User

@@ -77,3 +77,10 @@ export const retrieveNumberOfDocuments = asyncWrapper(async(req,res)=>{
     const result = await dbMethods.getNumberOfDocument(Product)
     res.status(200).json({message:'This is the number of documents in model' , result})
 })
+
+/**apply virtual populate */
+export const virtualPopulate = asyncWrapper(async(req,res)=>{
+    const {_id} = req.query
+    const data = await Product.findById({_id}).populate({path:'userId'})
+    res.status(200).json({message:'virtual populate' ,data , Owner: data.userId.virtualUserName})
+})
