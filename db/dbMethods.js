@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt'
+
 export async function findOneMethod(modelType,field){
     const data = await modelType.findOne(field)
     return data
@@ -26,13 +28,6 @@ export async function deleteOneMethod(modelType, _id){
 export async function findAllMethod(modelType){
     const data = await modelType.find()
     return data
-}
-
-export function checkPasswordMethod(Product, password){
-    if(product.password !== password){
-        return {message:'you are not authorized' , success:false}
-    }
-        return {message:'Done' , success:true}
 }
 
 export async function searchWithNameAndAgeMethod(modelType,wordQuery , ageQuery){
@@ -102,4 +97,14 @@ export async function getNumberOfDocument(modelType){
         }
     ])
     return result
+}
+
+export function hashedPasswordMethod(password){
+    const passwordHash = bcrypt.hashSync(password , +process.env.SAULT_ROUNDS)
+    return passwordHash
+}
+
+export function comparePassword(password , comparePassword){
+    const check = bcrypt.compareSync(password, comparePassword)
+    return check
 }

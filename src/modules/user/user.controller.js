@@ -5,27 +5,35 @@ import Product from '../../../db/models/product.model.js'
 
 export const signUp = asyncWrapper(async(req,res)=>{
     const {username,email,password,age,gender,phone} = req.body
+
     const isEmailDuplicate = await dbMethods.findOneMethod(User,{email:email})
     if(isEmailDuplicate){
         return res.status(400).json({message:'This email already used'})
     }
-    const newUser = await dbMethods.createMethod(User,{username,email,password,age,gender,phone})
+
+    const hashedPassword = dbMethods.hashedPasswordMethod(password)
+
+    const newUser = await dbMethods.createMethod(User,{username,email,password:hashedPassword,age,gender,phone})
     if(!newUser){
         return res.status(400).json({message:'Signup failed'})
     }
+
     res.status(201).json({message:'User registered successfully',newUser})
 })
 
 export const signIn = asyncWrapper(async(req,res)=>{
     const {email,password} = req.body
-    const user = await dbMethods.findOneMethod(User,'email' , email)
+    const user = await dbMethods.findOneMethod(User,{email:email})
     if(!user){
         return res.status(404).json({message:'Email or password are wrong'})
     }
-    const checkPassword = dbMethods.checkPasswordMethod(user,password)
-    if(checkPassword){
+
+    const checkPassword = dbMethods.comparePassword(password , user.password)
+
+    if(!checkPassword){
         return res.status(401).json({message:'Email or password are wrong'})
     }
+    
     res.status(200).json({message:'You are logged successfully'})
 })
 
