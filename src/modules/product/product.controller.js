@@ -31,7 +31,7 @@ export const updateProduct = asyncWrapper(async(req,res)=>{
     }
     const notValidOwner = dbMethods.checkIsThisOwnerOrNot(productFound,owner)
     if(!notValidOwner.success){
-        return res.status(400).json({message:'You are not authorized'})
+        return res.status(401).json({message:'You are not authorized'})
     }
     const updatedProduct = await dbMethods.updateOneMethod(Product,productId,{name,price,description})
     if(!updatedProduct){
@@ -49,7 +49,7 @@ export const deleteProduct = asyncWrapper(async(req,res)=>{
     }
     const notOwnerValid = dbMethods.checkIsThisOwnerOrNot(productFound,owner)
     if(!notOwnerValid.success){
-        return res.status(400).json({message:'You are not authorized'})
+        return res.status(401).json({message:'You are not authorized'})
     }
     const deletedProductApply = await dbMethods.deleteOneMethod(Product,productId)
     if(!deletedProductApply){

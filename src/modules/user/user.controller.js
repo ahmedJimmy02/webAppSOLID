@@ -8,7 +8,7 @@ export const signUp = asyncWrapper(async(req,res)=>{
 
     const isEmailDuplicate = await dbMethods.findOneMethod(User,{email:email})
     if(isEmailDuplicate){
-        return res.status(400).json({message:'This email already used'})
+        return res.status(409).json({message:'This email already used'})
     }
 
     const hashedPassword = dbMethods.hashedPasswordMethod(password)
