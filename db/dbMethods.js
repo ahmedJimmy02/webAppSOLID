@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 export async function findOneMethod(modelType,field){
     const data = await modelType.findOne(field)
@@ -107,4 +108,14 @@ export function hashedPasswordMethod(password){
 export function comparePassword(password , comparePassword){
     const check = bcrypt.compareSync(password, comparePassword)
     return check
+}
+
+export function generateToken(data){
+    const token = jwt.sign(data , process.env.SECRET_KEY , {expiresIn:'2d'})
+    return token
+}
+
+export function verifyToken(auth){
+    const token = jwt.verify(auth,  process.env.SECRET_KEY)
+    return token
 }

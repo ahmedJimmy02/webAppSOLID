@@ -3,15 +3,12 @@ import * as dbMethods from '../../../db/dbMethods.js'
 import Product from '../../../db/models/product.model.js'
 import User from '../../../db/models/user.model.js'
 
-export const addProduct = asyncWrapper(async(req,res)=>{
-    const {name,description,price,userId} = req.body
-    const userFound = await dbMethods.findByIDMethod(User,userId)
-    if(!userFound){
-        return res.status(404).json({message:'User not found'})
-    }
+export const addProduct = asyncWrapper(async(req,res,next)=>{
+    const {name,description,price} = req.body
+    const userId = req.payload.id
     const newProduct = await dbMethods.createMethod(Product,{name,description,price,userId})
     if(!newProduct){
-        return res.status(400).json({message:'created Failed'})
+        return next(new Error('Created Failed' , {cause:400}))
     }
     res.status(201).json({message:'Product added successfully', newProduct})
 }) 
@@ -21,39 +18,39 @@ export const listProduct = asyncWrapper(async(req,res)=>{
     res.status(200).json({message:'All products',products})
 })
 
-export const updateProduct = asyncWrapper(async(req,res)=>{
+export const updateProduct = asyncWrapper(async(req,res,next)=>{
     const {name,description,price} = req.body
-    const owner = req.query.owner
+    const owner = req.payload.id
     const productId = req.query.productId
     const productFound = await dbMethods.findByIDMethod(Product,productId)
     if(!productFound){
-        return res.status(404).json({message:'Product not found'})
+        return next(new Error('Product not found', {cause:404}))
     }
     const notValidOwner = dbMethods.checkIsThisOwnerOrNot(productFound,owner)
     if(!notValidOwner.success){
-        return res.status(401).json({message:'You are not authorized'})
+        return next(new Error('You are not authorized' , {cause:401}))
     }
     const updatedProduct = await dbMethods.updateOneMethod(Product,productId,{name,price,description})
     if(!updatedProduct){
-        return res.status(400).json({message:'update failed'})
+        return next(new Error('Update failed' , {cause:400}))
     }
     res.status(200).json({message:'Product updated successfully'})
 })
 
-export const deleteProduct = asyncWrapper(async(req,res)=>{
-    const owner = req.query.owner
+export const deleteProduct = asyncWrapper(async(req,res,next)=>{
+    const owner = req.payload.id
     const productId = req.query.productId
     const productFound = await dbMethods.findByIDMethod(Product,productId)
     if(!productFound){
-        return res.status(404).json({message:'Product not found'})
+        return next(new Error('Product not found', {cause:404}))
     }
     const notOwnerValid = dbMethods.checkIsThisOwnerOrNot(productFound,owner)
     if(!notOwnerValid.success){
-        return res.status(401).json({message:'You are not authorized'})
+        return next(new Error('You are not authorized' , {cause:403}))
     }
     const deletedProductApply = await dbMethods.deleteOneMethod(Product,productId)
     if(!deletedProductApply){
-        return res.status(400).json({message:'deleted failed'})
+        return next(new Error('Updated failed' , {cause:400}))
     }
     res.status(200).json({message:'Product deleted successfully'})
 })

@@ -3,63 +3,59 @@ import * as dbMethods from '../../../db/dbMethods.js'
 import User from '../../../db/models/user.model.js'
 import Product from '../../../db/models/product.model.js'
 
-export const signUp = asyncWrapper(async(req,res)=>{
+export const signUp = asyncWrapper(async(req,res,next)=>{
     const {username,email,password,age,gender,phone} = req.body
 
     const isEmailDuplicate = await dbMethods.findOneMethod(User,{email:email})
     if(isEmailDuplicate){
-        return res.status(409).json({message:'This email already used'})
+        return next(new Error('This email already used'))
     }
 
     const hashedPassword = dbMethods.hashedPasswordMethod(password)
 
     const newUser = await dbMethods.createMethod(User,{username,email,password:hashedPassword,age,gender,phone})
     if(!newUser){
-        return res.status(400).json({message:'Signup failed'})
+        return next(new Error('Signup failed'))
     }
 
-    res.status(201).json({message:'User registered successfully',newUser})
+    const token = dbMethods.generateToken({id:newUser._id , email:newUser.email})
+
+    res.status(201).json({message:'User registered successfully',newUser , token})
 })
 
-export const signIn = asyncWrapper(async(req,res)=>{
+export const signIn = asyncWrapper(async(req,res,next)=>{
     const {email,password} = req.body
     const user = await dbMethods.findOneMethod(User,{email:email})
     if(!user){
-        return res.status(404).json({message:'Email or password are wrong'})
+        return next(new Error('Invalid credentials'))
     }
 
     const checkPassword = dbMethods.comparePassword(password , user.password)
 
     if(!checkPassword){
-        return res.status(401).json({message:'Email or password are wrong'})
+        return next(new Error('Invalid credentials'))
     }
+
+    const token = dbMethods.generateToken({id:user._id , email:user.email})
     
-    res.status(200).json({message:'You are logged successfully'})
+    res.status(200).json({message:'You are logged successfully' , token})
 })
 
-export const updateUser = asyncWrapper(async(req,res)=>{
+export const updateUser = asyncWrapper(async(req,res,next)=>{
     const {username,password,age,phone} = req.body
-    const userId = req.query.id
-    const userFound = await dbMethods.findByIDMethod(User,userId)
-    if(!userFound){
-        return res.status(404).json({message:'User not found'})
-    }
+    const userId = req.payload.id
     const updatedUser = await dbMethods.updateOneMethod(User,userId,{username,password,age,phone})
     if(!updatedUser){
-        return res.status(400).json({message:'Update failed'})
+        return next(new Error('Update failed' , {cause:400}))
     }
     res.status(200).json({message:'User updated successfully'})
 })
 
-export const deleteUser = asyncWrapper(async(req,res)=>{
-    const userId = req.query.id
-    const userFound = await dbMethods.findByIDMethod(User,userId)
-    if(!userFound){
-        return res.status(404).json({message:'User not found'})
-    }
+export const deleteUser = asyncWrapper(async(req,res,next)=>{
+    const userId = req.payload.id
     const deletedAccount = await dbMethods.deleteOneMethod(User,userId)
     if(!deletedAccount){
-        return res.status(400).json({message:'Deletion failed'})
+        return next(new Error('Deletion failed' , {cause:400}))
     }
     res.status(200).json({message:'User deleted successfully'})
 })
@@ -83,7 +79,7 @@ export const listUsers = asyncWrapper(async(req,res)=>{
 })
 
 export const userProduct = asyncWrapper(async(req,res)=>{
-    const userId = req.query.owner
+    const userId = req.payload.id
     const userProduct = await dbMethods.searchUserProducts(Product,userId)
     res.status(200).json({message:'Theses are products to owner' , userProduct})
 })
