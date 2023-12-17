@@ -115,7 +115,7 @@ export function generateToken(data){
     return token
 }
 
-export function verifyToken(auth){
-    const token = jwt.verify(auth,  process.env.SECRET_KEY)
-    return token
+export function verifyToken(token){
+    const payload = jwt.verify(token,  process.env.SECRET_KEY)
+    return payload
 }
