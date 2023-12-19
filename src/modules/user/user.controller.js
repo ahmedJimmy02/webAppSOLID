@@ -3,6 +3,8 @@ import * as dbMethods from '../../../db/dbMethods.js'
 import User from '../../../db/models/user.model.js'
 import Product from '../../../db/models/product.model.js'
 import generateToken from '../../auth/generateToke.js'
+import hashedPasswordMethod from '../../auth/hashedPasswordMethod.js'
+import comparePassword from '../../auth/comparePassword.js'
 
 export const signUp = asyncWrapper(async(req,res,next)=>{
     const {username,email,password,age,gender,phone} = req.body
@@ -12,7 +14,7 @@ export const signUp = asyncWrapper(async(req,res,next)=>{
         return next(new Error('This email already used'))
     }
 
-    const hashedPassword = dbMethods.hashedPasswordMethod(password)
+    const hashedPassword = hashedPasswordMethod(password)
 
     const newUser = await dbMethods.createMethod(User,{username,email,password:hashedPassword,age,gender,phone})
     if(!newUser){
@@ -31,7 +33,7 @@ export const signIn = asyncWrapper(async(req,res,next)=>{
         return next(new Error('Invalid credentials'))
     }
 
-    const checkPassword = dbMethods.comparePassword(password , user.password)
+    const checkPassword = comparePassword(password , user.password)
 
     if(!checkPassword){
         return next(new Error('Invalid credentials'))

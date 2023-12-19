@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 
 export async function findOneMethod(modelType,field){
     const data = await modelType.findOne(field)
@@ -98,14 +97,4 @@ export async function getNumberOfDocument(modelType){
         }
     ])
     return result
-}
-
-export function hashedPasswordMethod(password){
-    const passwordHash = bcrypt.hashSync(password , +process.env.SAULT_ROUNDS)
-    return passwordHash
-}
-
-export function comparePassword(password , comparePassword){
-    const check = bcrypt.compareSync(password, comparePassword)
-    return check
 }
