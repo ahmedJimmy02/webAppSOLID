@@ -109,13 +109,3 @@ export function comparePassword(password , comparePassword){
     const check = bcrypt.compareSync(password, comparePassword)
     return check
 }
-
-export function generateToken(data){
-    const token = jwt.sign(data , process.env.SECRET_KEY , {expiresIn:'2d'})
-    return token
-}
-
-export function verifyToken(token){
-    const payload = jwt.verify(token,  process.env.SECRET_KEY)
-    return payload
-}

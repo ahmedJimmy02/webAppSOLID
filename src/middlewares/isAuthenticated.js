@@ -1,6 +1,8 @@
-import { findByIDMethod, verifyToken } from "../../db/dbMethods.js"
+import { findByIDMethod } from "../../db/dbMethods.js"
 import User from "../../db/models/user.model.js"
 import asyncWrapper from '../../utils/asyncWrapper.js'
+import verifyToken from "../auth/verifyToke.js"
+
 
 const isAuthenticated = asyncWrapper(async(req,res,next)=>{
     let {token} = req.headers

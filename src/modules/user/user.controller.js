@@ -2,6 +2,7 @@ import asyncWrapper from '../../../utils/asyncWrapper.js'
 import * as dbMethods from '../../../db/dbMethods.js'
 import User from '../../../db/models/user.model.js'
 import Product from '../../../db/models/product.model.js'
+import generateToken from '../../auth/generateToke.js'
 
 export const signUp = asyncWrapper(async(req,res,next)=>{
     const {username,email,password,age,gender,phone} = req.body
@@ -18,7 +19,7 @@ export const signUp = asyncWrapper(async(req,res,next)=>{
         return next(new Error('Signup failed'))
     }
 
-    const token = dbMethods.generateToken({id:newUser._id , email:newUser.email})
+    const token = generateToken({id:newUser._id , email:newUser.email})
 
     res.status(201).json({message:'User registered successfully',newUser , token})
 })
@@ -36,7 +37,7 @@ export const signIn = asyncWrapper(async(req,res,next)=>{
         return next(new Error('Invalid credentials'))
     }
 
-    const token = dbMethods.generateToken({id:user._id , email:user.email})
+    const token = generateToken({id:user._id , email:user.email})
     
     res.status(200).json({message:'You are logged successfully' , token})
 })
