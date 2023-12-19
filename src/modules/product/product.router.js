@@ -1,13 +1,15 @@
 import { Router } from "express";
 import * as productController from './product.controller.js' 
-import isAuthenticated from "../../middlewares/isAuthenticated.js";
+import authMiddleware from '../../middlewares/auth.middleware.js'
+import asyncWrapper from '../../../utils/asyncWrapper.js'
+
 
 const router = Router()
 
-router.post('/products',isAuthenticated, productController.addProduct)
+router.post('/products',asyncWrapper(authMiddleware()), productController.addProduct)
 router.get('/products', productController.listProduct)
-router.put('/products',isAuthenticated, productController.updateProduct)
-router.delete('/products',isAuthenticated, productController.deleteProduct)
+router.put('/products',asyncWrapper(authMiddleware()), productController.updateProduct)
+router.delete('/products',asyncWrapper(authMiddleware()), productController.deleteProduct)
 router.get('/productsWithOwnerInfo', productController.getAllProductsWithOwners)
 router.get('/productsSorted', productController.sortProducts)
 router.get('/productLookup', productController.productWithOwnersUsingLookup)

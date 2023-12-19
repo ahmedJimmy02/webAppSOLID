@@ -28,10 +28,17 @@ const userSchema = new mongoose.Schema(
             enum:['Male' , 'Female'],
             default:'Male'
         },
+        agent:{
+            type:String
+        },
+        IPAddress:{
+            type:String
+        }
     },
     {timestamps:true}
 )
 
+// because virtual populate return bSON => binary json
 userSchema.set('toObject',{virtuals:true})
 userSchema.set('toJSON',{virtuals:true})
 

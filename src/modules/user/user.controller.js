@@ -2,9 +2,10 @@ import asyncWrapper from '../../../utils/asyncWrapper.js'
 import * as dbMethods from '../../../db/dbMethods.js'
 import User from '../../../db/models/user.model.js'
 import Product from '../../../db/models/product.model.js'
-import generateToken from '../../auth/generateToke.js'
+import generateToken from '../../auth/generateToken.js'
 import hashedPasswordMethod from '../../auth/hashedPasswordMethod.js'
 import comparePassword from '../../auth/comparePassword.js'
+import UAParser from 'ua-parser-js'
 
 export const signUp = asyncWrapper(async(req,res,next)=>{
     const {username,email,password,age,gender,phone} = req.body
@@ -40,6 +41,11 @@ export const signIn = asyncWrapper(async(req,res,next)=>{
     }
 
     const token = generateToken({id:user._id , email:user.email})
+
+    const agent = req.headers['user-agent']
+    const IPAddress = req.ip
+
+    await dbMethods.updateOneMethod(User, user._id ,{agent , IPAddress})
     
     res.status(200).json({message:'You are logged successfully' , token})
 })
