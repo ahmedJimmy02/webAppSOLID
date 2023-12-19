@@ -32,7 +32,14 @@ const userSchema = new mongoose.Schema(
     {timestamps:true}
 )
 
-userSchema.virtual('virtualUserName').get(function(){
+userSchema.set('toObject',{virtuals:true})
+userSchema.set('toJSON',{virtuals:true})
+
+userSchema.virtual('virtualUserName', {
+    ref:'Product',
+    localField:'_id',
+    foreignField:'userId'
+}).get(function(){
     return `This is my username :  ${this.username}`
 })
 
