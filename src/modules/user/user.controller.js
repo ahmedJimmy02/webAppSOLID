@@ -5,7 +5,7 @@ import Product from '../../../db/models/product.model.js'
 import generateToken from '../../auth/generateToken.js'
 import hashedPasswordMethod from '../../auth/hashedPasswordMethod.js'
 import comparePassword from '../../auth/comparePassword.js'
-import UAParser from 'ua-parser-js'
+
 
 export const signUp = asyncWrapper(async(req,res,next)=>{
     const {username,email,password,age,gender,phone} = req.body

@@ -2,12 +2,13 @@ import { Router } from "express";
 import * as userController from './user.controller.js'
 import authMiddleware from '../../middlewares/auth.middleware.js'
 import asyncWrapper from '../../../utils/asyncWrapper.js'
-
+import validationMiddleware from "../../middlewares/validation.middleware.js";
+import * as userValidationSchemas from './user.validationScheams.js'
 
 
 const router = Router()
 
-router.post('/',userController.signUp)
+router.post('/', validationMiddleware(userValidationSchemas.signUpSchema),userController.signUp)
 router.post('/login',userController.signIn) 
 router.put('/',asyncWrapper(authMiddleware()),userController.updateUser)
 router.delete('/',asyncWrapper(authMiddleware()),userController.deleteUser)

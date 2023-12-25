@@ -18,6 +18,10 @@ const authMiddleware = ()=>{
 
         const payload = verifyToken(token)
 
+        if(!payload || !payload.id){
+            return next(new Error('Invalid credentials' , {cause:403}))
+        }
+
         const user = await findByIDMethod(User , payload.id)
         if(!user){
             return next(new Error('Please make registration operation' , {cause:404}))
