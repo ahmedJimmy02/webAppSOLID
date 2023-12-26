@@ -18,3 +18,9 @@ export const signUpSchema ={
     })
     .with('password' , 'repass')
 }
+
+export const activationSchema = {
+    params:joi.object({
+        token:joi.string().required()
+    })
+}

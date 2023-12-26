@@ -5,6 +5,8 @@ import Product from '../../../db/models/product.model.js'
 import generateToken from '../../auth/generateToken.js'
 import hashedPasswordMethod from '../../auth/hashedPasswordMethod.js'
 import comparePassword from '../../auth/comparePassword.js'
+import { sendEmails } from '../../../utils/sendEmail.js'
+import verifyToken from '../../auth/verifyToken.js'
 
 
 export const signUp = asyncWrapper(async(req,res,next)=>{
@@ -22,9 +24,29 @@ export const signUp = asyncWrapper(async(req,res,next)=>{
         return next(new Error('Signup failed'))
     }
 
-    const token = generateToken({id:newUser._id , email:newUser.email})
+    const token = generateToken({email:newUser.email})
+    // send email
+    const messageSent = await sendEmails({
+        to:newUser.email , 
+        subject:'Account Activation',
+        html:`<a href='http://localhost:3000/activate_account/${token}'>Activate your account</a>`
+    })
 
-    res.status(201).json({message:'User registered successfully',newUser , token})
+    if(!messageSent){
+        return next(new Error('Email is invalid',{cause:400}))
+    }
+
+    res.status(201).json({message:'User registered successfully',newUser})
+})
+
+export const activateAccount = asyncWrapper(async(req,res,next)=>{
+    const {token} = req.params
+
+    const payload = verifyToken(token)
+
+    await User.findOneAndUpdate({email:payload.email} , {$set:{isConfirmed:true} ,})
+
+    return res.status(200).json({message:'Email activation done successfully'})
 })
 
 export const signIn = asyncWrapper(async(req,res,next)=>{
@@ -33,6 +55,8 @@ export const signIn = asyncWrapper(async(req,res,next)=>{
     if(!user){
         return next(new Error('Invalid credentials'))
     }
+
+    if(!user.isConfirmed) return next(new Error('You should to activate your account first',{cause:400}))
 
     const checkPassword = comparePassword(password , user.password)
 

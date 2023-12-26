@@ -33,7 +33,11 @@ const userSchema = new mongoose.Schema(
         },
         IPAddress:{
             type:String
-        }
+        },
+        isConfirmed:{
+            type:Boolean,
+            default:false
+        },
     },
     {timestamps:true}
 )

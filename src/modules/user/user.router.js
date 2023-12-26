@@ -9,6 +9,7 @@ import * as userValidationSchemas from './user.validationScheams.js'
 const router = Router()
 
 router.post('/', validationMiddleware(userValidationSchemas.signUpSchema),userController.signUp)
+router.get('/activate_account/:token' ,validationMiddleware(userValidationSchemas.activationSchema) ,userController.activateAccount)
 router.post('/login',userController.signIn) 
 router.put('/',asyncWrapper(authMiddleware()),userController.updateUser)
 router.delete('/',asyncWrapper(authMiddleware()),userController.deleteUser)
