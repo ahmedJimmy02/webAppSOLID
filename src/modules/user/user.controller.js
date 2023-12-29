@@ -116,3 +116,8 @@ export const userProduct = asyncWrapper(async(req,res)=>{
     const userProduct = await dbMethods.searchUserProducts(Product,userId)
     res.status(200).json({message:'Theses are products to owner' , userProduct})
 })
+
+export const fileUpload = asyncWrapper(async(req,res)=>{
+    console.log(req.file)
+    res.status(200).json({message:'Done', data:req.file})
+})

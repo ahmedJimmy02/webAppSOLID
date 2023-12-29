@@ -11,6 +11,7 @@ dotenv.config()
 db_connection()
 
 app.use(express.json())
+app.use('/uploads' , express.static('src/uploads'))
 app.use(userRouter)
 app.use(productRouter)
 
