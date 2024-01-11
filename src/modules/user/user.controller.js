@@ -7,6 +7,7 @@ import hashedPasswordMethod from '../../auth/hashedPasswordMethod.js'
 import comparePassword from '../../auth/comparePassword.js'
 import { sendEmails } from '../../../utils/sendEmail.js'
 import verifyToken from '../../auth/verifyToken.js'
+import cloudinaryConnection from '../../../utils/cloudinary.js'
 
 
 export const signUp = asyncWrapper(async(req,res,next)=>{
@@ -118,6 +119,9 @@ export const userProduct = asyncWrapper(async(req,res)=>{
 })
 
 export const fileUpload = asyncWrapper(async(req,res)=>{
-    console.log(req.file)
-    res.status(200).json({message:'Done', data:req.file})
+    const data = await cloudinaryConnection().uploader.upload(req.file.path , {
+        folder:'general/users',
+        resource_type: 'image',
+    })
+    res.status(200).json({message:'Done',data})
 })

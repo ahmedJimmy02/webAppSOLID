@@ -1,13 +1,30 @@
 import asyncWrapper from '../../../utils/asyncWrapper.js'
 import * as dbMethods from '../../../db/dbMethods.js'
 import Product from '../../../db/models/product.model.js'
-import User from '../../../db/models/user.model.js'
+import Like from '../../../db/models/like.model.js'
+import cloudinaryConnection from '../../../utils/cloudinary.js'
+import generateUniqueString from '../../../utils/generateUniqueString.js'
 
 export const addProduct = asyncWrapper(async(req,res,next)=>{
     const {name,description,price} = req.body
     const userId = req.payload.id
-    const newProduct = await dbMethods.createMethod(Product,{name,description,price,userId})
+    if(!req.files?.length){
+        return next(new Error('Please upload at least one image' , {cause:400}))
+    }
+    let images = []
+    let publicIdsArr = []
+    const folderId = generateUniqueString()
+    for (const file of req.files) {
+        const {secure_url,public_id} = await cloudinaryConnection().uploader.upload(file.path,{
+            folder: `upVoteImages/products/${userId}/${folderId}`
+        })
+        images.push({secure_url,public_id,folderId})
+        publicIdsArr.push(public_id)
+    }
+    const newProduct = await dbMethods.createMethod(Product,{name,description,price,userId , images})
     if(!newProduct){
+        const data = await cloudinaryConnection().api.delete_resources(publicIdsArr)
+        console.log(data)
         return next(new Error('Created Failed' , {cause:400}))
     }
     res.status(201).json({message:'Product added successfully', newProduct})
@@ -80,4 +97,31 @@ export const virtualPopulate = asyncWrapper(async(req,res)=>{
     const {_id} = req.query
     const data = await Product.findById({_id}).populate({path:'userId'})
     res.status(200).json({message:'virtual populate' ,owner:data.userId.virtualUserName})
+})
+
+/*like or unlike*/
+export const likeOrUnlike = asyncWrapper(async(req,res,next)=>{
+    const {productId} = req.params
+    const likedBy = req.payload.id
+    const {onModel} = req.body
+    const productFound = await dbMethods.findByIDMethod(Product,productId)
+    if(!productFound){return next(new Error('Product not found', {cause:404}))}
+    const isLikedBefore = await Like.findOne({likedBy , likeDoneOnId:productId})
+    if(isLikedBefore){
+        await Like.findByIdAndDelete(isLikedBefore._id)
+        productFound.numberOfLikes--
+        await productFound.save()
+        return res.status(200).json({message:'Un-liked successfully' , productFound})
+    }
+    const like = await dbMethods.createMethod(Like , {likedBy , onModel , likeDoneOnId:productId})
+    productFound.numberOfLikes++
+    await productFound.save()
+    res.status(200).json({message:'Like done successfully' , data: like , productFound})
+})
+
+/*get all likes*/
+export const getAllLikesForProduct = asyncWrapper(async(req,res)=>{
+    const {productId} = req.params
+    const allLikes = await Like.find({likeDoneOnId: productId}).populate([{path:'likeDoneOnId'}])
+    res.status(200).json({message:'success' , allLikes})
 })

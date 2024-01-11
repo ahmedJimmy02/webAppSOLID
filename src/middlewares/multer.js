@@ -5,7 +5,8 @@ import fs from 'fs'
 import path from 'path'
 // middleware
 
-export const multerMiddleware = ({extension = allowedExtensions.image , filePath = 'general'})=>{
+// local
+export const multerMiddlewareLocal = ({extension = allowedExtensions.image , filePath = 'general'})=>{
     // path check
     const destinationPath = path.resolve(`src/uploads/${filePath}`)
     if(!fs.existsSync(destinationPath)){
@@ -33,3 +34,22 @@ export const multerMiddleware = ({extension = allowedExtensions.image , filePath
     return file
 }
 // application/octet-stream => default when no extension
+
+// cloud
+export const multerMiddleware = ({extension = allowedExtensions.image})=>{
+    const storage = multer.diskStorage({
+        filename: function(req,file,cb){
+            cb(null , file.originalname)
+        }
+    })
+    // file filter
+    const fileFilter = (req,file,cb)=>{
+        if(extension.includes(file.mimetype.split('/')[1])){
+            return cb(null , true)
+        }
+        return cb(new Error('Format is not allowed') , false)
+    }
+
+    const file = multer({fileFilter , storage})
+    return file
+}

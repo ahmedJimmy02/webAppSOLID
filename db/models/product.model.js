@@ -17,7 +17,13 @@ const productSchema = new mongoose.Schema(
         userId:{
             type:mongoose.Schema.Types.ObjectId,
             ref:'User'
-        }
+        },
+        images:[{
+            public_id:{type:String , required:true , unique: true},
+            secure_url:{type:String , required: true},
+            folderId:{type:String , required: true}
+        }],
+        numberOfLikes: {type:Number , default: 0 , min:0}
     },
     {timestamps:true}
 )

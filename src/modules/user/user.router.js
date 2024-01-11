@@ -19,6 +19,6 @@ router.get('/searchAgeBetween',userController.searchAgeBetween)
 router.get('/listUsers',userController.listUsers)
 router.get('/userProducts',asyncWrapper(authMiddleware()),userController.userProduct)
 
-router.post('/upload' , multerMiddleware({extension:allowedExtensions.image, filePath:'customers/profiles'}).single('cv') ,userController.fileUpload)
+router.post('/upload' , multerMiddleware({extension:allowedExtensions.image}).single('cv') ,userController.fileUpload)
 
 export default router
