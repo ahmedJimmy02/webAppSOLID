@@ -10,7 +10,7 @@ const router = Router()
 
 router.post('/products',asyncWrapper(authMiddleware()), multerMiddleware({extension:allowedExtensions.image}).array('pp',3) ,productController.addProduct)
 router.get('/products', productController.listProduct)
-router.put('/products',asyncWrapper(authMiddleware()), productController.updateProduct)
+router.put('/products',asyncWrapper(authMiddleware()), multerMiddleware({extension:allowedExtensions.image}).single('image'),productController.updateProduct)
 router.delete('/products',asyncWrapper(authMiddleware()), productController.deleteProduct)
 router.get('/productsWithOwnerInfo', productController.getAllProductsWithOwners)
 router.get('/productsSorted', productController.sortProducts)

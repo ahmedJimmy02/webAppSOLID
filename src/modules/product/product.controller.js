@@ -4,6 +4,7 @@ import Product from '../../../db/models/product.model.js'
 import Like from '../../../db/models/like.model.js'
 import cloudinaryConnection from '../../../utils/cloudinary.js'
 import generateUniqueString from '../../../utils/generateUniqueString.js'
+import Comment from '../../../db/models/comment.model.js'
 
 export const addProduct = asyncWrapper(async(req,res,next)=>{
     const {name,description,price} = req.body
@@ -36,7 +37,7 @@ export const listProduct = asyncWrapper(async(req,res)=>{
 })
 
 export const updateProduct = asyncWrapper(async(req,res,next)=>{
-    const {name,description,price} = req.body
+    const {name,description,price,oldPublicId}  = req.body
     const owner = req.payload.id
     const productId = req.query.productId
     const productFound = await dbMethods.findByIDMethod(Product,productId)
@@ -47,10 +48,23 @@ export const updateProduct = asyncWrapper(async(req,res,next)=>{
     if(!notValidOwner.success){
         return next(new Error('You are not authorized' , {cause:401}))
     }
-    const updatedProduct = await dbMethods.updateOneMethod(Product,productId,{name,price,description})
-    if(!updatedProduct){
-        return next(new Error('Update failed' , {cause:400}))
+    if(name) productFound.name = name
+    if(description) productFound.description = description
+    if(price) productFound.price = price
+    if(oldPublicId){
+        if(!req.file) return next(new Error('Please upload new image',{cause:400}))
+        await cloudinaryConnection().uploader.destroy(oldPublicId)
+        const {secure_url , public_id} = await cloudinaryConnection().uploader.upload(req.file.path,{
+            folder:`upVoteImages/products/${owner}/${productFound.images[0].folderId}`
+        })
+        productFound.images.map(image=>{
+            if(image.public_id === oldPublicId){
+                image.public_id = public_id
+                image.secure_url = secure_url
+            }
+        })
     }
+    await productFound.save()
     res.status(200).json({message:'Product updated successfully'})
 })
 
@@ -67,8 +81,18 @@ export const deleteProduct = asyncWrapper(async(req,res,next)=>{
     }
     const deletedProductApply = await dbMethods.deleteOneMethod(Product,productId)
     if(!deletedProductApply){
-        return next(new Error('Updated failed' , {cause:400}))
+        return next(new Error('Deleted failed' , {cause:400}))
     }
+    let publicIdArr = []
+    for (const image of productFound.images) {
+        publicIdArr.push(image.public_id)
+    }
+    let folderIdArr = []
+    const folderPath = `upVoteImages/products/${owner}/${productFound.images[0].folderId}`
+    folderIdArr.push(folderPath)
+    await cloudinaryConnection().api.delete_resources(publicIdArr)
+    const deleteFolder = await cloudinaryConnection().api.delete_folder(folderIdArr)
+    console.log(deleteFolder)
     res.status(200).json({message:'Product deleted successfully'})
 })
 
@@ -78,8 +102,15 @@ export const getAllProductsWithOwners = asyncWrapper(async(req,res)=>{
 })
 
 export const sortProducts = asyncWrapper(async(req,res)=>{
-    const sortedProducts = await dbMethods.getSortedDescendingByCreatedAt(Product)
-    res.status(200).json({message:'Products sorted descending by createdAt field',sortedProducts})
+    const products = Product.find().cursor()
+    let finalResult = []
+    for(let doc = await products.next(); doc!=null ; doc = await products.next()){
+        const comments = await Comment.find({productId:doc._id})
+        const docObject = doc.toObject()
+        docObject.comments = comments
+        finalResult.push(docObject)
+    }
+    res.status(200).json({message:'Products sorted descending by createdAt field',finalResult})
 })
 
 export const productWithOwnersUsingLookup = asyncWrapper(async(req,res)=>{
