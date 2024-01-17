@@ -3,8 +3,8 @@ import User from "../../db/models/user.model.js"
 import verifyToken from "../auth/verifyToken.js"
 
 
-
-const authMiddleware = ()=>{
+// systemRoles => array
+const authMiddleware = (systemRoles)=>{
     return async(req,res,next)=>{
         let {token} = req.headers
         if(!token){
@@ -26,6 +26,9 @@ const authMiddleware = ()=>{
         if(!user){
             return next(new Error('Please make registration operation' , {cause:404}))
         }
+
+        const found = systemRoles?.includes(user.role)
+        if(!found){ return next(new Error('You are not authorized to access these routes',{cause:401}))}
 
         req.payload = payload
         next()

@@ -14,22 +14,3 @@ export const addComment = asyncWrapper(async(req,res,next)=>{
     if(!comment) return next(new Error('Comment creation failed',{cause:400}))
     res.status(201).json({message:'Comment added successfully' , comment})
 })
-
-export const likeOrUnlike = asyncWrapper(async(req,res,next)=>{
-    const {commentId} = req.params
-    const likedBy = req.payload.id
-    const {onModel} = req.body
-    const commentFound = await dbMethods.findByIDMethod(Comment,commentId)
-    if(!commentFound){return next(new Error('Comment not found', {cause:404}))}
-    const isLikedBefore = await Like.findOne({likedBy , likeDoneOnId:commentId})
-    if(isLikedBefore){
-        await Like.findByIdAndDelete(isLikedBefore._id)
-        commentFound.numberOfLikes--
-        await commentFound.save()
-        return res.status(200).json({message:'Un-liked successfully' , count:commentFound.numberOfLikes})
-    }
-    const like = await dbMethods.createMethod(Like , {likedBy , onModel , likeDoneOnId:commentId})
-    commentFound.numberOfLikes++
-    await commentFound.save()
-    res.status(200).json({message:'Like done successfully' , data: like , count:commentFound.numberOfLikes})
-})

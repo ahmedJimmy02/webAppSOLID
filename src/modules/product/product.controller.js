@@ -130,26 +130,6 @@ export const virtualPopulate = asyncWrapper(async(req,res)=>{
     res.status(200).json({message:'virtual populate' ,owner:data.userId.virtualUserName})
 })
 
-/*like or unlike*/
-export const likeOrUnlike = asyncWrapper(async(req,res,next)=>{
-    const {productId} = req.params
-    const likedBy = req.payload.id
-    const {onModel} = req.body
-    const productFound = await dbMethods.findByIDMethod(Product,productId)
-    if(!productFound){return next(new Error('Product not found', {cause:404}))}
-    const isLikedBefore = await Like.findOne({likedBy , likeDoneOnId:productId})
-    if(isLikedBefore){
-        await Like.findByIdAndDelete(isLikedBefore._id)
-        productFound.numberOfLikes--
-        await productFound.save()
-        return res.status(200).json({message:'Un-liked successfully' , productFound})
-    }
-    const like = await dbMethods.createMethod(Like , {likedBy , onModel , likeDoneOnId:productId})
-    productFound.numberOfLikes++
-    await productFound.save()
-    res.status(200).json({message:'Like done successfully' , data: like , productFound})
-})
-
 /*get all likes*/
 export const getAllLikesForProduct = asyncWrapper(async(req,res)=>{
     const {productId} = req.params
