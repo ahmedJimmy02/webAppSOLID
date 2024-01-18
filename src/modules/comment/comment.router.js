@@ -6,6 +6,5 @@ import asyncWrapper from '../../../utils/asyncWrapper.js'
 const router = Router()
 
 router.post('/:productId' , asyncWrapper(authMiddleware()) , commentController.addComment)
-router.post('/likeOrUnlike/:commentId' , asyncWrapper(authMiddleware()) , commentController.likeOrUnlike)
 
 export default router

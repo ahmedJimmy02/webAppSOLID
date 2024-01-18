@@ -1,7 +1,7 @@
 import systemRoles from "../../../utils/systemRoles.js";
 
-const authorizationRoutes = {
+const endPointsRoles = {
     ADD_PRODUCT : [systemRoles.USER]
 }
 
-export default authorizationRoutes
+export default endPointsRoles

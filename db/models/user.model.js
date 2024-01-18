@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import systemRoles from '../../utils/systemRoles.js'
 
 const userSchema = new mongoose.Schema(
     {
@@ -40,8 +41,8 @@ const userSchema = new mongoose.Schema(
         },
         role:{
             type:String,
-            enum:['user','admin'],
-            default: 'user'
+            enum:[systemRoles.USER,systemRoles.ADMIN],
+            default: systemRoles.USER
         }
     },
     {timestamps:true}

@@ -5,6 +5,7 @@ import Like from '../../../db/models/like.model.js'
 import cloudinaryConnection from '../../../utils/cloudinary.js'
 import generateUniqueString from '../../../utils/generateUniqueString.js'
 import Comment from '../../../db/models/comment.model.js'
+import axios from 'axios'
 
 export const addProduct = asyncWrapper(async(req,res,next)=>{
     const {name,description,price} = req.body
@@ -135,4 +136,31 @@ export const getAllLikesForProduct = asyncWrapper(async(req,res)=>{
     const {productId} = req.params
     const allLikes = await Like.find({likeDoneOnId: productId}).populate([{path:'likeDoneOnId'}])
     res.status(200).json({message:'success' , allLikes})
+})
+
+export const usingAxios = asyncWrapper(async(req,res)=>{
+    /**
+     * step 1
+     * step 2
+     */
+    const {productId} = req.params
+    const {onModel} = req.body
+    const {token} = req.headers
+    axios({
+        method:'post',
+        url:`http://localhost:3000/like/likeOrUnLike/${productId}`,
+        data:{
+            onModel
+        },
+        headers:{
+            token
+        }
+    }).then((resp)=> {
+        console.log(resp.data)
+        res.status(200).json({response:resp.data})
+    })
+    .catch((err)=> {
+        console.log(err.data)
+        res.status(500).json({catch:err.data})
+    })
 })
